@@ -1,34 +1,30 @@
 package me.octahex.gui;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-import java.util.ArrayList;
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-
 import me.octahex.core.Config;
-import me.octahex.core.DBManager;
-import me.octahex.core.Note;
-import me.octahex.core.NoteManager;
+import net.miginfocom.swing.MigLayout;
 
-import javax.swing.JMenuBar;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JTree;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.JList;
-import javax.swing.JTable;
 
 public class MainFrame extends JFrame
 {
 	private static final long serialVersionUID = -6415026719192740389L;
 	private JPanel _contentPane;
+	private MigLayout _layout;
+	private EditorState _currentState;
+	private ComponentManager _componentManager;
 	private JMenuBar _menuBar;
-	private JList<Note> _noteList;
+	
 
 	/**
 	 * Create the frame.
@@ -38,15 +34,47 @@ public class MainFrame extends JFrame
 		initFrame();
 		setLookAndFeel();
 		initContentPane();
-		initMenu();
-		initNoteList();
+		initLayout();
+		_currentState = new ReadingState();
+		_componentManager = new ComponentManager(_contentPane);
+		initMenuBar();
+		_currentState.updateComponents(_componentManager);
+	}
+
+	private void initMenuBar()
+	{
+		_menuBar = new JMenuBar();
+		setJMenuBar(_menuBar);
+		JMenu mnFile = new JMenu("File");
+		_menuBar.add(mnFile);
+
+		JMenuItem mntmNew = new JMenuItem("New");
+		mnFile.add(mntmNew);
+		mntmNew.setActionCommand("new");
+		mntmNew.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				_currentState = new CreatingState();
+				_currentState.updateComponents(_componentManager);
+			}
+		});
+	}
+
+	private void initLayout()
+	{
+		_layout = new MigLayout("", // layout constraints
+				"[]20[][grow]", // Column constraints
+				"[][grow]"); // Row constraints
+		_contentPane.setLayout(_layout);
 	}
 
 	private void initFrame()
 	{
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 750, 520);
-		setTitle(Config.progName+" v."+Config.progVersion);
+		setBounds(1920 + 100, 100, 750, 520);
+		setTitle(Config.progName + " v." + Config.progVersion);
 	}
 
 	private void setLookAndFeel()
@@ -61,30 +89,12 @@ public class MainFrame extends JFrame
 		}
 	}
 
-	private void initNoteList()
-	{
-		Note[] notes = DBManager.getInstance().fetchAllNotes();
-		_noteList = new JList<>(notes);
-		_contentPane.add(_noteList, BorderLayout.WEST);
-	}
-
 	private void initContentPane()
 	{
 		_contentPane = new JPanel();
 		_contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		_contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(_contentPane);
+		_contentPane.setBackground(Color.BLACK);
 	}
 
-	private void initMenu()
-	{
-		_menuBar = new JMenuBar();
-		setJMenuBar(_menuBar);
-
-		JMenu mnFile = new JMenu("File");
-		_menuBar.add(mnFile);
-
-		JMenuItem mntmNew = new JMenuItem("New");
-		mnFile.add(mntmNew);
-	}
 }

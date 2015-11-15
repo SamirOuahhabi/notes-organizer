@@ -10,9 +10,8 @@ public class NoteManager
 {
 	public static DefaultListModel<Note> getSavedNotes()
 	{
-//		File folder = new File(Config.savePath);
-//		File[] noteFiles = folder.listFiles();
-//		DefaultListModel<Note> listModel = new DefaultListModel<>();
+
+		DefaultListModel<Note> listModel = new DefaultListModel<>();
 //		for(int i = 0; i < noteFiles.length; i++)
 //		{
 //			listModel.addElement(new Note(noteFiles[i]));
